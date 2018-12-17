@@ -7,3 +7,8 @@ Tool that attempts to visualize the control flow of an application.
 + Parse a ctags file to get function names and locations.
 + Use universal ctags since it is maintaned
 + Export as an SVG to avoid resolution degradation
+
+## Necessary packages
+
++ ArgsParse
++ 
