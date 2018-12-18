@@ -5,7 +5,7 @@
 int main() {
 
     // try to make a surface to 
-    cairo_surface_t * surface = cairo_svg_surface_create ("test.svg",400,400);
+    cairo_surface_t * surface = cairo_svg_surface_create("test.svg",400,400);
     cairo_t * cr = cairo_create(surface);
 
     // sets all the pixels to white
