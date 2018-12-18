@@ -10,6 +10,9 @@ function parseFile(filenames::Array{String})
 
         
         # select parser based on file extension
+
+
+        # parser takes in the whole file as a string and parses it.
         
         close(file)
     end
