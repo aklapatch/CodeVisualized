@@ -65,3 +65,43 @@ function drawRelLineCairo(env::cairo_env,pos_x::Float64,pos_y::Float64,dist_x::F
 
     ccall((:cairo_stroke,"libcairo"),Cvoid,(Ptr{Cvoid},),env.cr)
 end
+
+
+# the tip of the arrow will be at pos_x and pos_y
+# width is the width of the base of the arrow
+# length is the distance from tip to base
+# angle is the orientation of the arrow, 0 points right, 90 points down, 180 left, and 270 up
+function drawArrowCairo(env::cairo_env,pos_x::Float64,pos_y::Float64,width::Float64,height::Float64,angle::Float64)
+    ccall((:cairo_move_to,"libcairo"),Cvoid,(Ptr{Cvoid},Float64,Float64),env.cr,pos_x,pos_y)
+
+    # get the hypotenuse 
+    hypotenuse = ((width^2)*.25 + (height^2))^0.5
+
+    # get the angle of the triangle
+    tri_angle = atan(width*0.5/height)
+    #other_angle = pi/2 - tri_angle
+
+    # add the angle argument (convert to radians)
+    arrow_angle = tri_angle + angle*pi/180
+    println(sin(arrow_angle))
+    other_angle = pi/2 - angle*pi/180 
+    println(sin(other_angle))
+
+    
+    # draw the hypotenuse on a specific angle
+    ccall((:cairo_rel_line_to,"libcairo"),Cvoid,(Ptr{Cvoid},Float64,Float64),env.cr,-hypotenuse*cos(arrow_angle),hypotenuse*sin(arrow_angle))
+
+    # draw the base line (the width line)
+    ccall((:cairo_rel_line_to,"libcairo"),Cvoid,(Ptr{Cvoid},Float64,Float64),env.cr,-width*cos(other_angle),-width*sin(other_angle))
+
+    ccall((:cairo_close_path,"libcairo"),Cvoid,(Ptr{Cvoid},),env.cr)
+
+    # set fill rule and fill                                             CAIRO_FILL_RULE_EVEN_ODD  
+    ccall((:cairo_set_fill_rule,"libcairo"),Cvoid,(Ptr{Cvoid},Int32),env.cr,1)
+    ccall((:cairo_fill,"libcairo"),Cvoid,(Ptr{Cvoid},),env.cr)
+
+    # move back to where you were
+    ccall((:cairo_move_to,"libcairo"),Cvoid,(Ptr{Cvoid},Float64,Float64),env.cr,pos_x,pos_y)
+
+    #ccall((:cairo_stroke,"libcairo"),Cvoid,(Ptr{Cvoid},),env.cr)
+end
