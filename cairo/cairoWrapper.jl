@@ -83,9 +83,7 @@ function drawArrowCairo(env::cairo_env,pos_x::Float64,pos_y::Float64,width::Floa
 
     # add the angle argument (convert to radians)
     arrow_angle = tri_angle + angle*pi/180
-    println(sin(arrow_angle))
     other_angle = pi/2 - angle*pi/180 
-    println(sin(other_angle))
 
     
     # draw the hypotenuse on a specific angle
