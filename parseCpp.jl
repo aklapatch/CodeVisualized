@@ -76,15 +76,18 @@ function findBlock(file::String, start::Int)
     i = start
     len = length(file)
 
-    b_types = Vector{Int64}(undef,3)
+    b_types = Vector{Int64}(undef,2)
     b_types[1] = findPattern("if",file,i,len)
     b_types[2]= findPattern("else",file,i,len)
-    b_types[3] = findPattern("else if",file,i,len)
+
+    if b_types[1] == b_types[2] 
+        return len,"done"
+    end
 
     # find the closest block
     smallest = 1
     j = 1
-    while j < 4
+    while j < 3
         if b_types[j] < b_types[smallest]
             smallest = j
         end
@@ -95,10 +98,14 @@ function findBlock(file::String, start::Int)
         return b_types[1],"if"
 
     elseif smallest == 2
-        return b_types[2],"else"
 
-    elseif smallest == 3
-        return b_types[3],"else if"
+        # figure out if there is an else if and return it
+        if (findPattern("\n",file,b_types[2],len) < findPattern("if", file,b_types[2],len))
+            return b_types[2],"else"
+        else 
+
+            return findPattern("if", file,b_types[2],len),"else if"
+        end
     end
     
     # no blocks found
@@ -148,9 +155,9 @@ function getIfBlock(file::String,i::Int)
     
     # if you find a { before a alphanumeric char, then they are for that if
     brace_dex = findPattern("{",file, close_paren, len)
-    if ( brace_dex > len)
+    if ( brace_dex > findPattern(";",file,close_paren,len))
         code_end = findPattern(";",file,close_paren,len)
-        true_code = file[close_paren:code_end]
+        true_code = file[close_paren+1:code_end]
 
         # find if there is an else block
         if findBlock(file,code_end)[2] == "else"
@@ -162,7 +169,7 @@ function getIfBlock(file::String,i::Int)
     
     elseif (all(isspace, file[close_paren:brace_dex]))
         code_end = findPattern(";",file,close_paren,len)
-        true_code = file[close_paren:code_end]
+        true_code = file[close_paren+1:code_end]
 
         # find if there is an else block
         if findBlock(file,code_end)[2] == "else"
