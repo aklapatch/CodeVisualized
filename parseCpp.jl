@@ -146,6 +146,34 @@ function getControlBlockNum(file::String)
     return num_of_blocks
 end
 
+# traverse the code until you find another else 
+# if you find an else if keep going
+function hasElse(file::String,i::Int)
+    len = length(file)
+
+    # if there is an else if, keep going
+    first_else = findPattern("else",file,i,len)
+    if first_else > len
+        return false
+    end
+
+    # if there is an if following the code block, there is no else
+    if first_else > findPattern("if",file,i,len)
+        return false
+    end
+
+    # go until you find an if before the \n
+    while findPattern("if",file,first_else,len) < findPattern("\n",file,first_else,len)
+        # when the if is connected to the else
+        first_else = findPattern("else",file,first_else+1,len)
+    end
+
+    #once you get through the else if's check for another else
+    if findPattern("else",file,i,len) < len
+        return true
+    end
+end
+
 function getIfBlock(file::String,i::Int)
     len = length(file)
 
@@ -159,25 +187,13 @@ function getIfBlock(file::String,i::Int)
         code_end = findPattern(";",file,close_paren,len)
         true_code = file[close_paren+1:code_end]
 
-        # find if there is an else block
-        if findBlock(file,code_end)[2] == "else"
-            
-            return (code_end,if_block(condition,true_code,true))
-        else 
-            return (code_end,if_block(condition,true_code,false))
-        end
+        return (code_end,if_block(condition,true_code,hasElse(file,code_end)))
     
     elseif (all(isspace, file[close_paren:brace_dex]))
         code_end = findPattern(";",file,close_paren,len)
         true_code = file[close_paren+1:code_end]
 
-        # find if there is an else block
-        if findBlock(file,code_end)[2] == "else"
-    
-            return (code_end,if_block(condition,true_code,true))
-        else 
-            return (code_end,if_block(condition,true_code,false))
-        end
+        return (code_end,if_block(condition,true_code,hasElse(file,code_end)))
 
     # get code in between braces
     else 
@@ -186,13 +202,7 @@ function getIfBlock(file::String,i::Int)
 
         true_code = file[code_start:code_end]
         
-        # find if there is an else block
-        if findBlock(file,code_end)[2] == "else"
-    
-            return (code_end,if_block(condition,true_code,true))
-        else 
-            return (code_end,if_block(condition,true_code,false))
-        end
+        return (code_end,if_block(condition,true_code,hasElse(file,code_end)))
     end
 end
 
@@ -207,16 +217,16 @@ function initBlock(file::String, i::Int, typ::String)
     if (typ == "if")
         return getIfBlock(file,i)
     elseif (typ == "else if")
-
+        return getElseIfBlock(file,i)
 
     elseif (typ == "else")
-
+        return getElseBlock(file,i)
     else 
         throw(ArgumentError("Block type not recognized"))
     end
 end
 
-function getIfElseBlock(file::String,i::Int)
+function getElseIfBlock(file::String,i::Int)
     len = length(file)
 
     open_paren =findPattern("(",file,i,len)

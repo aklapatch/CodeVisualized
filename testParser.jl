@@ -46,7 +46,13 @@ else {
     # test the if block init function
     i = 1
     i,block = getIfBlock(code_wo_comments,i)
-    println(block.condition,"\nNext\n",block.true_code,"\nNext\n",block.has_else)
+    println(block.condition,"\ntrue code:\n",block.true_code,"\nelse statement?\n",block.has_else)
+
+    i,block = getElseIfBlock(code_wo_comments,i+1)
+    println(block.condition,"\ntrue code:\n",block.true_code,"\nelse statement?\n",block.has_else)
+
+    i,block = getElseBlock(code_wo_comments,i+1)
+    println(block.condition,"\ntrue code:\n",block.true_code,"\n")
 end
 
 main()
