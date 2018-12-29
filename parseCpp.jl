@@ -239,25 +239,13 @@ function getElseIfBlock(file::String,i::Int)
         code_end = findPattern(";",file,close_paren,len)
         true_code = file[close_paren:code_end]
 
-        # find if there is an else block
-        if findBlock(file,code_end)[2] == "else"
-            
-            return (code_end,if_block(condition,true_code,true))
-        else 
-            return (code_end,if_block(condition,true_code,false))
-        end
+        return code_end,if_else_block(condition,true_code,hasElse(file,code_end))
     
-    elseif (all(isspace, file[close_paren:brace_dex]))
-        code_end = findPattern(";",file,close_paren,len)
-        true_code = file[close_paren:code_end]
+    elseif findPattern(";",file,close_paren,len) < findPattern("{",file,close_paren,len)
+        code_end = findPattern(";",file,close_paren+1,len)
+        true_code = file[close_paren+1:code_end]
 
-        # find if there is an else block
-        if findBlock(file,code_end)[2] == "else"
-    
-            return (code_end,if_block(condition,true_code,true))
-        else 
-            return (code_end,if_block(condition,true_code,false))
-        end
+        return code_end,if_else_block(condition,true_code,hasElse(file,code_end))
 
     # get code in between braces
     else 
@@ -266,63 +254,39 @@ function getElseIfBlock(file::String,i::Int)
 
         true_code = file[code_start:code_end]
         
-        # find if there is an else block
-        if findBlock(file,code_end)[2] == "else"
-    
-            return (code_end,if_block(condition,true_code,true))
-        else 
-            return (code_end,if_block(condition,true_code,false))
-        end
+        return code_end,if_else_block(condition,true_code,hasElse(file,code_end))
     end
 end
 
 function getElseBlock(file::String,i::Int)
     len = length(file)
 
-    open_paren =findPattern("(",file,i,len)
-    close_paren = findPattern(")",file,i,len)
-    condition = file[open_paren:close_paren]
-    
+    # find the end of the else keyword
+    code_start = findPattern("else",file,i,len)
+
     # if you find a { before a alphanumeric char, then they are for that if
-    brace_dex = findPattern("{",file, close_paren, len)
+    brace_dex = findPattern("{",file, code_start, len)
     if ( brace_dex > len)
-        code_end = findPattern(";",file,close_paren,len)
-        true_code = file[close_paren:code_end]
+        code_end = findPattern(";",file,code_start,len)
+        true_code = file[code_start+4:code_end]
 
-        # find if there is an else block
-        if findBlock(file,code_end)[2] == "else"
-            
-            return (code_end,if_block(condition,true_code,true))
-        else 
-            return (code_end,if_block(condition,true_code,false))
-        end
+        return code_end,else_block(true_code)
     
-    elseif (all(isspace, file[close_paren:brace_dex]))
-        code_end = findPattern(";",file,close_paren,len)
-        true_code = file[close_paren:code_end]
+    # if a semicolon is before a brace, then there are no braces
+    elseif findPattern(";",file,code_start,len) < findPattern("{",file,code_start,len)
+        code_end = findPattern(";",file,code_start,len)
+        true_code = file[code_start+4:code_end]
 
-        # find if there is an else block
-        if findBlock(file,code_end)[2] == "else"
-    
-            return (code_end,if_block(condition,true_code,true))
-        else 
-            return (code_end,if_block(condition,true_code,false))
-        end
+        return code_end,else_block(true_code)
 
     # get code in between braces
-    else 
-        code_start = findPattern("{",file,close_paren,len)
+    else
+        code_start = findPattern("{",file,code_start,len)
         code_end = findPattern("}",file,code_start,len)
 
         true_code = file[code_start:code_end]
         
-        # find if there is an else block
-        if findBlock(file,code_end)[2] == "else"
-    
-            return (code_end,if_block(condition,true_code,true))
-        else 
-            return (code_end,if_block(condition,true_code,false))
-        end
+        return code_end,else_block(true_code)
     end
 end
 
