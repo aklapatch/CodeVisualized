@@ -100,7 +100,7 @@ function findBlock(file::String, start::Int)
     elseif smallest == 2
 
         # figure out if there is an else if and return it
-        if (findPattern("\n",file,b_types[2],len) < findPattern("if", file,b_types[2],len))
+        if findPattern("\n",file,b_types[2],len) < findPattern("if", file,b_types[2],len)
             return b_types[2],"else"
         else 
 
@@ -294,7 +294,6 @@ end
 # this code assumes it starts right after the if statement
 function initBlock(file::String, i::Int, typ::String)
     # find the end of the block
-
     len = length(file)
     # get the condition and the code if true
     if (typ == "if")
@@ -307,14 +306,13 @@ function initBlock(file::String, i::Int, typ::String)
         return getElseBlock(file,i)
 
     else 
-        throw(ArgumentError("Block type not recognized"))VH
+        throw(ArgumentError("Block type not recognized"))
     end
 end
 
 # first, count the number of control blocks, allocate the array
 # then return it after filling it with the proper contents
 function parseCpp(file_contents::String)
-    delim::Char = ';'
 
     file_contents = filterComments(file_contents)
 
@@ -323,14 +321,14 @@ function parseCpp(file_contents::String)
     i=1
     times = 1
     output = []
-    block_tuple = findBlock(file_contents,i)
+    i,block_type = findBlock(file_contents,i)
 
     # go until you hit the end of the file
-    while block_tuple[2] != "done"
+    while block_type != "done"
 
-        block = initBlock(file_contents,i)
-        output = vcat[output, initBlock(block_tuple[2])]
-        block_tuple = findBlock(file_contents,block_tuple[1])
+        block = initBlock(file_contents,i,block_type)
+        output = cat[output, block]
+        i,block_type = findBlock(file_contents,i)
     end
     
 

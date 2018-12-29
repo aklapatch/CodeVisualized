@@ -42,27 +42,14 @@ else {
         println(i," ",str)
     end
 
-    # test the if block init function
-    i = 1
-    i,block = getIfBlock(code_wo_comments,i)
-    println(block.condition,"\ntrue code:\n",block.true_code,"\nelse statement?\n",block.has_else)
-
-    i,block = getElseIfBlock(code_wo_comments,i+1)
-    println(block.condition,"\ntrue code:\n",block.true_code,"\nelse statement?\n",block.has_else)
-
-    i,block = getElseBlock(code_wo_comments,i+1)
-    println("\ntrue code:\n",block.code,"\n")
-
-    # try the brace versions
-    i,block = getIfBlock(code_wo_comments,i)
-    println(block.condition,"\ntrue code:\n",block.true_code,"\nelse statement?\n",block.has_else)
-
-    i,block = getElseIfBlock(code_wo_comments,i+1)
-    println(block.condition,"\ntrue code:\n",block.true_code,"\nelse statement?\n",block.has_else)
-
-    i,block = getElseBlock(code_wo_comments,i+1)
-    println("\ntrue code:\n",block.code,"\n")
-
+    
+    output = parseCpp(code_wo_comments)
+    
+    for block in output
+        
+        println(block.true_code)
+        
+    end
 
 end
 

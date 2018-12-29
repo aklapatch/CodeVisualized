@@ -13,5 +13,5 @@ mutable struct if_else_block <: control_block
 end
 
 mutable struct else_block <: control_block
-    code::String
+    true_code::String
 end
