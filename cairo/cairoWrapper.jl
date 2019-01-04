@@ -103,3 +103,29 @@ function drawArrowCairo(env::cairo_env,pos_x::Float64,pos_y::Float64,width::Floa
 
     #ccall((:cairo_stroke,"libcairo"),Cvoid,(Ptr{Cvoid},),env.cr)
 end
+
+# draw a line with an arrow on the end of it
+function drawArrowLineCairo(env::cairo_env,
+                            x::Float64,
+                            y::Float64,
+                            x_line_dist::Float64,
+                            y_line_dist::Float64,
+                            arrow_width::Float64,
+                            arrow_height::Float64)
+
+    drawRelLineCairo(env,x,y,x_line_dist,y_line_dist)
+
+    cur_x = x+x_line_dist
+    cur_y = y+y_line_dist
+
+    if x_line_dist < 0.0
+        arrow_angle = 180 -( 180*(atan(y_line_dist/x_line_dist)/pi))
+    else
+        arrow_angle = -( 180*(atan(y_line_dist/x_line_dist)/pi))
+    end
+    println(arrow_angle)
+
+    #put the arrow at the end of the line
+    drawArrowCairo(env,cur_x,cur_y,arrow_width,arrow_height,arrow_angle)
+    
+end

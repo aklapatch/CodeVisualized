@@ -299,7 +299,7 @@ function initBlock(file::String, i::Int, typ::String)
     if (typ == "if")
         return getIfBlock(file,i)
     elseif (typ == "else if")
-        return getIfElseBlock(file,i)
+        return getElseIfBlock(file,i)
         
 
     elseif (typ == "else")
@@ -327,11 +327,10 @@ function parseCpp(file_contents::String)
     while block_type != "done"
 
         block = initBlock(file_contents,i,block_type)
-        output = cat[output, block]
-        i,block_type = findBlock(file_contents,i)
+        push!(output,block)
+        i,block_type = findBlock(file_contents,i+1)
     end
     
-
     return output
 
 end

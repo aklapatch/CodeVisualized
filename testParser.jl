@@ -7,23 +7,30 @@ atdsavapsodfiuase */
 
 if ( y < 60)
     // do stuff
-    ;
+    printf(test);
 
 else if (y > 49) 
     // do more stuff
-    ;
+    test = 32 + 3;
 else 
     // do most stuff
-    ;
+    yadda ydadda yadda;
 
 if ( y < 32){
     // do stuff
+
+
+    test text for the block
 }
 else if (y > 42) {
     // do more stuff
+
+    more teset text for this stuff
 }
 else {
     // do most stuff
+    wohooo
+    test text for this
 }
 """
 
@@ -43,11 +50,11 @@ else {
     end
 
     
-    output = parseCpp(code_wo_comments)
+    output = parseCpp(code)
     
     for block in output
         
-        println(block.true_code)
+        println(block[2].true_code)
         
     end
 
