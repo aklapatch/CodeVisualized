@@ -4,8 +4,8 @@ mutable struct cairo_env
 end
 
 # init cairo layer
-function initCairo(height::Float64,width::Float64)::cairo_env
-    surface = ccall((:cairo_svg_surface_create,"libcairo"),Ptr{Cvoid},(Cstring,Float64,Float64),"test.svg",height,width)
+function initCairo(file_name::String,height::Float64,width::Float64)::cairo_env
+    surface = ccall((:cairo_svg_surface_create,"libcairo"),Ptr{Cvoid},(Cstring,Float64,Float64),file_name,height,width)
     cr = ccall((:cairo_create,"libcairo"),Ptr{Cvoid},(Ptr{Cvoid},),surface)
 
     # set image to white
@@ -123,7 +123,6 @@ function drawArrowLineCairo(env::cairo_env,
     else
         arrow_angle = -( 180*(atan(y_line_dist/x_line_dist)/pi))
     end
-    println(arrow_angle)
 
     #put the arrow at the end of the line
     drawArrowCairo(env,cur_x,cur_y,arrow_width,arrow_height,arrow_angle)

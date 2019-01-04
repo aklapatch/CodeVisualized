@@ -1,7 +1,7 @@
 include("cairoWrapper.jl")
 
 # get a cr and surface
-y = initCairo(200.0,400.0)
+y = initCairo("out.svg",200.0,400.0)
  
 setLineWidthCairo(y,2.0)
 
