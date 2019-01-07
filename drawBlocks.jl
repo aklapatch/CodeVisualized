@@ -4,11 +4,8 @@ include("dataStructure.jl")
 # constants for drawing methods
 
 # mulitpliers to make diamonds and boxes fit around text
-const text_w_mult= 3.0
-const text_h_mult = 3.0
-
-#diamond height
-const dia_height= 20.0
+const text_w_mult= 5.0
+const text_h_mult = 2.0
 
 # font_size
 const font_size = 10.0
@@ -55,97 +52,77 @@ function longestLineLength(input::String)::Int64
     return max_len
 end
 
-function drawCondition(env::cairo_env,condition::String,x::Float64,y::Float64,true_code::String)
-    global text_w_mult 
-    global dia_height
-    global arrow_height
-    global arrow_width
-    global line_dist_x
-    global line_dist_y
-    global font_size
-
-    condition_len = length(text)
-    dia_w = length(text)*text_w_mult
-    # draw the diamond to hold the text
-    drawDiamondCairo(env,x,y,dia_w, dia_height)
-
-    # draw the text in the diamond
-    drawTextCairo(env,x,y+dia_height/2,font_size,"Sans",text)
-
-    # draw text for true and false statements
-    drawTextCairo(env,x+dia_w/2,y+dia_height/2,font_size,"Sans","Yes")
-
-    # draw text for true and false statements
-    drawTextCairo(env,x,y+dia_height+font_size,font_size,"Sans","No")
-
-    # draw the arrow to the true code
-    drawArrowLineCairo(env,
-                    x + (dia_w*0.5),
-                    y+(dia_height/2),
-                    line_dist_x,
-                    0,
-                    arrow_width,
-                    arrow_height)
+# draws a box with the text, text inside
+# x and y are the top left corner of the rectangle
+function drawTextBox(env::cairo_env,text::String,x::Float64,y::Float64)
     
-    current_x::Float64 = x + (condition_len*text_mult*0.5) + line_dist_x
-    current_y::Float64 = y+(dia_height/2)
-
     # figure out how big the box needs to be
-    rect_height = getNumNewlines(true_code)*text_h_mult    
+    rect_height = getNumNewlines(text)*text_h_mult*font_size 
 
-    rect_width = longestLineLength(true_code)*text_w_mult
+    rect_width = longestLineLength(text)*text_w_mult
+
+
     # make the text box 
-    drawRectCairo(env,current_x,current_y,rect_width,rect_height)
+    drawRectCairo(env,x,y,rect_width,rect_height)
 
-    # draw the text
-    drawTextCairo(env,current_x,current_y,font_size,"Sans",true_code)
+    # split the strings at newlines
+    text = split(text,'\n')    
 
-    current_x = current_x + rect_width/2
-    current_y = current_y + rect_height
+    #where to print the text
+    current_y = y
+    current_x = x+2.0
 
-    return current_x, current_y
+    for str in text
+
+        # step down to print the next line
+        current_y += font_size+1
+
+        # draw the text
+        drawTextCairo(env,current_x,current_y,font_size,"Sans",str)
+
+    end    
+
+    # pass back the w and h of the rectangle
+    return rect_width,rect_height
 end
 
+function drawTextDiamond(env::cairo_env,text::String,x::Float64,y::Float64)::Float64
 
-# draw an if block
-# x and y are positions to draw the block
-function drawIf(env::cairo_env, input::if_block,x::Float64,y::Float64)
+    # get dimensions of text/diamond
+    text_h = getNumNewlines(text::String)*text_h_mult*font_size
+    text_w = longestLineLength(text)*text_w_mult
 
+    # use a 45 45 90 triangle (on the top of the text area)to get the height of 
+    # the diamond
+    # get the height of the triangle
+    extra_h = text_w*0.5*tan(pi/4)
 
+    # add the extra_h twice
+    dia_h_w = text_h + extra_h*2
 
-    # draw line to true code
-    
+    # draw the diamond
+    drawDiamondCairo(env, x,y,dia_h_w,dia_h_w)
 
-    #draw
+    # split the strings at newlines
+    text = split(text,'\n')    
 
+    #where to print the text
+    current_y = y + extra_h
+    current_x = x+2.0 - text_w/2
 
+    for str in text
 
-    # draw the true text and the true code
+        # step down to print the next line
+        current_y += font_size+1
 
-    # draw the false text
+        # draw the text
+        drawTextCairo(env,current_x,current_y,font_size,"Sans",str)
 
-    # draw line to continue on down
+    end   
 
-    # connect the lines for the true code and the false condition
-     
+    # draw the Yes and No text
+    drawTextCairo(env,x + dia_h_w/2, y + dia_h_w/2 -font_size ,font_size,"Sans","Yes")
+    drawTextCairo(env,x + 5, y + dia_h_w + font_size ,font_size,"Sans","No")
 
-    # return the ending x and y coordinates
+    return dia_h_w
 end
-
-
-
-
-# draw an else if block
-
-
-
-
-
-# draw an else block
-
-
-
-
-# this function calls the upper three functions and inits the cairo environment
-# input is a vector of control blocks
-# it checks the type and calls one of the above functions accordingly
