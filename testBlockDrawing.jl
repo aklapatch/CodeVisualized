@@ -12,13 +12,11 @@ function main()
 
 
     # draw diamond
-    drawTextDiamond(env,"Text that needs \n to be split up",
+    drawTextDiamond(env,"Text that needs to be split up",
                     100.0,200.0)            
 
 
     destroyCairo(env)
-
-
 end
 
 main()

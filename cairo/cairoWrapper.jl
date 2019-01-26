@@ -126,5 +126,4 @@ function drawArrowLineCairo(env::cairo_env,
 
     #put the arrow at the end of the line
     drawArrowCairo(env,cur_x,cur_y,arrow_width,arrow_height,arrow_angle)
-    
 end

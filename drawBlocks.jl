@@ -4,21 +4,21 @@ include("dataStructure.jl")
 # constants for drawing methods
 
 # mulitpliers to make diamonds and boxes fit around text
-const text_w_mult= 5.0
-const text_h_mult = 2.0
+const text_w_mult= 5.5
+const text_h_mult = 1.7
 
 # font_size
 const font_size = 10.0
 
-const line_dist_x = 10.0
-const line_dist_y = 10.0
+const line_dist_x = 30.0
+const line_dist_y = 30.0
 
 const arrow_height = 10.0
 const arrow_width = 10.0
 
 
 function getNumNewlines(input::String)::Int64
-    number::Int64 = 0
+    number::Int64 = 1
     for char in input
         if char == '\n'
             number +=1
@@ -34,7 +34,7 @@ function longestLineLength(input::String)::Int64
     for char in input
         if (char == '\n')
 
-            if(current_len > max_len)
+            if current_len > max_len
                 max_len = current_len
             end
 
@@ -54,7 +54,11 @@ end
 
 # draws a box with the text, text inside
 # x and y are the top left corner of the rectangle
-function drawTextBox(env::cairo_env,text::String,x::Float64,y::Float64)
+function drawTextBox(env::cairo_env,text::String,x::Float64,y::Float64, center_x::Bool)
+    
+    global font_size
+    global text_w_mult
+    global text_h_mult
     
     # figure out how big the box needs to be
     rect_height = getNumNewlines(text)*text_h_mult*font_size 
@@ -62,8 +66,17 @@ function drawTextBox(env::cairo_env,text::String,x::Float64,y::Float64)
     rect_width = longestLineLength(text)*text_w_mult
 
 
-    # make the text box 
-    drawRectCairo(env,x,y,rect_width,rect_height)
+    if center_x == true
+        # make the text box, and center it on the x
+        x -= rect_width/2
+        drawRectCairo(env,x,y,rect_width,rect_height)
+
+    else
+        # draw and center on y
+        y -= rect_height/2
+        drawRectCairo(env,x,y,rect_width,rect_height)
+    end
+
 
     # split the strings at newlines
     text = split(text,'\n')    
@@ -88,17 +101,16 @@ end
 
 function drawTextDiamond(env::cairo_env,text::String,x::Float64,y::Float64)::Float64
 
+    global font_size
+    global text_h_mult
+    global text_w_mult    
+
     # get dimensions of text/diamond
-    text_h = getNumNewlines(text::String)*text_h_mult*font_size
+    text_h = getNumNewlines(text)*text_h_mult*font_size
     text_w = longestLineLength(text)*text_w_mult
 
-    # use a 45 45 90 triangle (on the top of the text area)to get the height of 
-    # the diamond
-    # get the height of the triangle
-    extra_h = text_w*0.5*tan(pi/4)
-
-    # add the extra_h twice
-    dia_h_w = text_h + extra_h*2
+    # add the extra width to get the proper width of the diamod
+    dia_h_w = text_w + 2*text_h
 
     # draw the diamond
     drawDiamondCairo(env, x,y,dia_h_w,dia_h_w)
@@ -107,17 +119,15 @@ function drawTextDiamond(env::cairo_env,text::String,x::Float64,y::Float64)::Flo
     text = split(text,'\n')    
 
     #where to print the text
-    current_y = y + extra_h
-    current_x = x+2.0 - text_w/2
+    current_y = y + dia_h_w/2 - text_h/2 + font_size
+    current_x = x - text_w/2
 
     for str in text
-
-        # step down to print the next line
-        current_y += font_size+1
-
         # draw the text
         drawTextCairo(env,current_x,current_y,font_size,"Sans",str)
 
+        # step down to print the next line
+        current_y += font_size+1
     end   
 
     # draw the Yes and No text
