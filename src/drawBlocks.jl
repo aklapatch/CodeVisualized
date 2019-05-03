@@ -16,7 +16,6 @@ const line_dist_y = 30.0
 const arrow_height = 10.0
 const arrow_width = 10.0
 
-
 function getNumNewlines(input::String)::Int64
     number::Int64 = 1
     for char in input

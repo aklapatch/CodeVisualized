@@ -1,7 +1,5 @@
 include("drawBlocks.jl")
 
-# 
-
 # draws the diamond and the block of true code together
 function drawCondition(env::cairo_env,condition::String,x::Float64,y::Float64,true_code::String)
 
@@ -38,6 +36,20 @@ function drawCondition(env::cairo_env,condition::String,x::Float64,y::Float64,tr
     # we need to return all these since the program needs to be able to
     # figure out how to backtrack to the "No" arrow
     return x,y,false_x,false_y
+end
+
+
+function connectWArrowLines(env,origin_x,origin_y,end_x,end_y)
+
+    # get the distance to draw
+    x_dist = end_x - origin_x
+    y_dist = end_y - origin_y
+
+    # draw the first relative line before the joining line
+    drawRelLineCairo(env,origin_x,origin_y,y_dist,0.0)
+
+    drawArrowLineCairo(env,origin_x,origin_y+y_dist,0.0,x_dist)
+
 end
 
 # draws the control flow in the array
@@ -94,6 +106,8 @@ function drawFlow(input,filename::String, line_width::Float64)
                 push!(scope_stack,(current_x,current_y))
                 scope_index+=1
                 block_index+=1
+            else # connect the previous lines 
+                
             end
 
               
@@ -116,9 +130,8 @@ function drawFlow(input,filename::String, line_width::Float64)
                 push!(scope_stack[scope_index],(current_x,current_y))
                 block_index +=1
             
-            
             else # connect the previous lines 
-                
+
             end
 
 
@@ -145,6 +158,8 @@ function drawFlow(input,filename::String, line_width::Float64)
             end
 
             current_y+=line_dist_y
+
+            # connect the blocks with arrow lines
         
         # this is for regular blocks of code, with no conditions
         elseif typeof(input[i]) == String

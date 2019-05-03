@@ -4,23 +4,6 @@ include("parseCpp.jl")
 
 error_message = "File extension not found"
 
-# iterate through the array from right to left, returning all text before the . of the file extension
-function getFileExtension(filename::String)::String
-    # specify global variable
-    global error_message
-
-    i::Int = length(filename)
-
-    while i > 0
-        if (filename[i-1] == '.')
-            return filename[i:end]
-        end
-
-        i -= 1
-    end
-    return error_message
-end
-
 function parseFiles(filenames::Array{String})::AbstractArray{control_block}
 
     # specify global error message

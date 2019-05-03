@@ -1,0 +1,16 @@
+Things that are done:
+* cairo wrapper
+* argment parsing
+
+Things to do
+* argument handling
+* different modes for different arguments.
+* 
+
+Flow:
+* get mode from arguments
+* if -r, look for every file with the specified extension and parse it and draw its diagram.
+  go down every directory too and get all the files with that filter as well
+* if not -r, get every file in that array and read it in, draw that file and output it. Every file gets its
+  own drawing.
+* each file will have a separate diagram and the result will be put into that file.
